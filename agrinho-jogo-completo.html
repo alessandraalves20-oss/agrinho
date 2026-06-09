@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jogo da Coleta Seletiva e Compostagem — Mini-game educativo do Concurso Agrinho">
+    <title>Missão Planeta Limpo | Concurso Agrinho</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a1f0e;
+            --bg-card: #122818;
+            --neon-green: #39D353;
+            --gold: #FFD700;
+            --text-light: #f0f0f0;
+            --text-muted: #999;
+            --border-color: #39D353;
+            --error-red: #EF4444;
+            --success-green: #22C55E;
+            --warning-orange: #F97316;
+            --info-blue: #3B82F6;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            image-rendering: pixelated;
+            overflow-x: hidden;
+        }
+
+        /* ─── NAVBAR ─────────────────────────────────────────────────────────────── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(8, 16, 10, 0.97);
+            border-bottom: 3px solid var(--neon-green);
+            backdrop-filter: blur(8px);
+            padding: 0 1rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            text-decoration: none;
+            color: var(--neon-green);
+        }
+
+        .navbar-logo span { font-size: 1.5rem; filter: drop-shadow(0 0 6px var(--neon-green)); }
+
+        .navbar-links {
+            display: none;
+            gap: 0.5rem;
+        }
+
+        .navbar-links a {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            color: #aaa;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            transition: color 0.2s;
+        }
+
+        .navbar-links a:hover { color: var(--neon-green); }
+
+        .navbar-play-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            padding: 0.5rem 1rem;
+            background: var(--neon-green);
+            color: #0a1f0e;
+            border: none;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 0 #1a6b2a, 3px 0 0 0 #1a6b2a;
+        }
+
+        .navbar-play-btn:hover { filter: brightness(1.15); }
+        .navbar-play-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 0 #1a6b2a, 3px 0 0 0 #1a6b2a; }
+
+        @media (min-width: 768px) {
+            .navbar-links { display: flex; }
+        }
+
+        /* ─── HERO SECTION ───────────────────────────────────────────────────────── */
+        .hero {
+            margin-top: 56px;
+            min-height: 90vh;
+            background: linear-gradient(135deg, #0a1f0e 0%, #1a3a2a 50%, #0a1f0e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(57, 211, 83, 0.03) 2px,
+                rgba(57, 211, 83, 0.03) 4px
+            );
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(10, 20, 12, 0.85);
+            border: 2px solid var(--gold);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .hero h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 2rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px var(--neon-green), 0 0 40px rgba(57, 211, 83, 0.5);
+            animation: slideUp 0.4s ease-out 0.1s both;
+        }
+
+        .hero h1 .gold { color: var(--gold); text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(255, 215, 0, 0.5); }
+
+        .hero p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: #ccc;
+            animation: slideUp 0.4s ease-out 0.2s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideUp 0.4s ease-out 0.3s both;
+        }
+
+        .stat-box {
+            padding: 1rem;
+            background: rgba(10, 20, 12, 0.8);
+            border: 2px solid var(--neon-green);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            min-width: 120px;
+        }
+
+        .stat-value { font-size: 1.5rem; color: var(--gold); margin-bottom: 0.5rem; }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            animation: slideUp 0.4s ease-out 0.4s both;
+        }
+
+        .btn-pixel {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            padding: 1rem 1.5rem;
+            background: var(--neon-green);
+            color: #0a1f0e;
+            border: none;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 6px 0 0 #1a6b2a, 4px 0 0 0 #1a6b2a, 4px 6px 0 0 #0d3a14;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-pixel:hover { filter: brightness(1.15); }
+        .btn-pixel:active { transform: translateY(4px); box-shadow: 0 2px 0 0 #1a6b2a, 4px 0 0 0 #1a6b2a, 4px 2px 0 0 #0d3a14; }
+
+        .btn-pixel-gold {
+            background: var(--gold);
+            color: #1a0a00;
+            box-shadow: 0 6px 0 0 #b8860b, 4px 0 0 0 #b8860b, 4px 6px 0 0 #7a5900;
+        }
+
+        .btn-pixel-gold:active { box-shadow: 0 2px 0 0 #b8860b, 4px 0 0 0 #b8860b, 4px 2px 0 0 #7a5900; }
+
+        /* ─── GAME SECTION ───────────────────────────────────────────────────────── */
+        .game-section {
+            padding: 2rem 1rem;
+            background: rgba(5, 12, 7, 0.95);
+            border-top: 3px solid var(--neon-green);
+            border-bottom: 3px solid var(--neon-green);
+        }
+
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .pixel-divider {
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--neon-green) 0px,
+                var(--neon-green) 16px,
+                transparent 16px,
+                transparent 24px
+            );
+            opacity: 0.4;
+            max-width: 200px;
+            margin: 1rem auto;
+        }
+
+        .game-card {
+            background: rgba(10, 25, 14, 0.85);
+            border: 3px solid var(--neon-green);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(57, 211, 83, 0.3);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+            pointer-events: none;
+        }
+
+        /* Game UI */
+        .game-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: rgba(5, 12, 7, 0.92);
+            border-bottom: 2px solid var(--neon-green);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+        }
+
+        .hud-item { display: flex; align-items: center; gap: 0.5rem; }
+        .hud-label { color: var(--neon-green); }
+        .hud-value { color: var(--gold); min-width: 50px; }
+        .hud-hearts { display: flex; gap: 0.25rem; }
+        .heart { font-size: 1rem; }
+
+        .game-content {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .game-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .env-selector {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .env-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 3px solid var(--neon-green);
+            background: rgba(10, 25, 14, 0.85);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 200px;
+        }
+
+        .env-card:hover { transform: scale(1.05); }
+
+        .env-icon { font-size: 3rem; }
+        .env-name { font-family: 'Press Start 2P', monospace; font-size: 0.8rem; color: var(--neon-green); }
+        .env-desc { font-size: 0.85rem; color: #ccc; text-align: center; }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .waste-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(10, 25, 14, 0.85);
+            border: 3px solid #39D35344;
+            cursor: pointer;
+            transition: all 0.15s;
+            min-height: 80px;
+        }
+
+        .waste-item:hover { transform: scale(1.1); filter: brightness(1.2); }
+        .waste-item.selected { border-color: var(--neon-green); transform: scale(1.2); filter: brightness(1.3) drop-shadow(0 0 8px var(--neon-green)); }
+
+        .waste-emoji { font-size: 2rem; }
+        .waste-name { font-size: 0.7rem; font-weight: bold; text-align: center; }
+
+        .tip-box {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(57, 211, 83, 0.12);
+            border: 2px solid var(--neon-green);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .bins-row {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .bin-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 3px solid;
+            background-color: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.15s;
+            min-width: 70px;
+            min-height: 90px;
+        }
+
+        .bin-emoji { font-size: 1.5rem; }
+        .bin-label { font-size: 0.65rem; font-weight: bold; text-align: center; }
+
+        .feedback-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .feedback-overlay.show { display: flex; animation: bounceIn 0.4s ease-out; }
+
+        .feedback-box {
+            padding: 2rem;
+            text-align: center;
+            border: 4px solid;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            box-shadow: 0 0 30px;
+            max-width: 280px;
+        }
+
+        .feedback-box.correct {
+            background: rgba(57, 211, 83, 0.95);
+            color: #0a1f0e;
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(57, 211, 83, 0.8);
+        }
+
+        .feedback-box.wrong {
+            background: rgba(231, 76, 60, 0.95);
+            color: #fff;
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.8);
+        }
+
+        .result-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .result-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+        }
+
+        .result-title.victory { color: var(--gold); }
+        .result-title.gameover { color: var(--error-red); }
+
+        .stars {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2rem;
+            justify-content: center;
+        }
+
+        .star { filter: grayscale(1) opacity(0.3); }
+        .star.filled { filter: none; text-shadow: 0 0 15px var(--gold); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            background: rgba(10, 25, 14, 0.85);
+            border: 3px solid var(--neon-green);
+            padding: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            color: var(--neon-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+
+        /* ─── GUIDE SECTION ──────────────────────────────────────────────────────── */
+        .guide-section {
+            padding: 2rem 1rem;
+            background: rgba(5, 12, 7, 0.95);
+        }
+
+        .guide-tabs {
+            display: flex;
+            gap: 0;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .guide-tab {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            padding: 0.75rem 1rem;
+            background: rgba(10, 25, 14, 0.8);
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .guide-tab.active {
+            background: var(--neon-green);
+            color: #0a1f0e;
+        }
+
+        .guide-content {
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .guide-content.active { display: block; }
+
+        .bins-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .bin-guide-card {
+            padding: 1rem;
+            background: rgba(10, 25, 14, 0.85);
+            border: 3px solid;
+            transition: all 0.2s;
+        }
+
+        .bin-guide-card:hover { transform: scale(1.02); }
+
+        .bin-guide-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .bin-color-box { width: 40px; height: 40px; border: 2px solid; display: flex; align-items: center; justify-content: center; }
+
+        .bin-guide-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+        }
+
+        .bin-guide-items {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .bin-guide-items li {
+            list-style: none;
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .bin-guide-items li::before { content: '▶'; font-size: 0.65rem; flex-shrink: 0; }
+
+        /* ─── FOOTER ─────────────────────────────────────────────────────────────── */
+        .footer {
+            background: rgba(5, 12, 7, 0.98);
+            border-top: 3px solid var(--neon-green);
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .footer-section h3 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p { font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.5rem; }
+
+        .footer-bottom {
+            border-top: 1px solid var(--neon-green);
+            padding-top: 1rem;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+        }
+
+        /* ─── ANIMATIONS ─────────────────────────────────────────────────────────── */
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .shake { animation: shake 0.4s ease-out; }
+        .float { animation: float 3s ease-in-out infinite; }
+
+        /* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.3rem; }
+            .hero p { font-size: 0.9rem; }
+            .stat-box { min-width: 100px; }
+            .env-card { min-width: 150px; }
+            .items-grid { grid-template-columns: repeat(3, 1fr); }
+            .bins-row { gap: 0.5rem; }
+            .bin-slot { min-width: 60px; min-height: 80px; }
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 1rem;
+            z-index: 999;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            width: 50px;
+            height: 50px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: var(--neon-green);
+            color: #0a1f0e;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 0 0 #1a6b2a;
+            transition: all 0.1s;
+        }
+
+        .scroll-to-top.show { display: flex; }
+        .scroll-to-top:active { transform: translateY(2px); box-shadow: 0 2px 0 0 #1a6b2a; }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="#" class="navbar-logo">
+            <span>♻️</span>
+            <div>
+                <div>MISSÃO</div>
+                <div>PLANETA LIMPO</div>
+            </div>
+        </a>
+        <div class="navbar-links">
+            <a href="#jogo">🎮 JOGO</a>
+            <a href="#guia">📚 GUIA</a>
+            <a href="#sobre">ℹ️ SOBRE</a>
+        </div>
+        <button class="navbar-play-btn" onclick="scrollToGame()">▶ JOGAR</button>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">🏆 CONCURSO AGRINHO 2025</div>
+            <h1>MISSÃO<br><span class="gold">PLANETA LIMPO</span></h1>
+            <p>Um mini-game educativo sobre <strong style="color: var(--neon-green);">coleta seletiva</strong> e <strong style="color: #A3E635;">compostagem</strong> — aprenda a destinar resíduos corretamente no campo e na cidade!</p>
+            
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <div class="stat-value">20+</div>
+                    <div>Tipos de Resíduos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">2</div>
+                    <div>Ambientes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">3</div>
+                    <div>Fases</div>
+                </div>
+            </div>
+
+            <div class="hero-buttons">
+                <button class="btn-pixel btn-pixel-gold" onclick="scrollToGame()">🎮 JOGAR AGORA</button>
+                <button class="btn-pixel" onclick="document.getElementById('guia').scrollIntoView({behavior:'smooth'})">📚 VER GUIA</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- GAME SECTION -->
+    <section class="game-section" id="jogo">
+        <div class="game-container">
+            <div class="section-header">
+                <h2>MINI-GAME</h2>
+                <div class="pixel-divider"></div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-hud" id="gameHUD" style="display: none;">
+                    <div class="hud-item">
+                        <span class="hud-label">PONTOS</span>
+                        <span class="hud-value" id="scoreDisplay">000000</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">VIDAS</span>
+                        <div class="hud-hearts" id="livesDisplay">
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                        </div>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">TEMPO</span>
+                        <span class="hud-value" id="timerDisplay">60</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">FASE</span>
+                        <span class="hud-value" id="roundDisplay">1/3</span>
+                    </div>
+                    <button class="btn-pixel" style="padding: 0.4rem 0.8rem; font-size: 0.6rem;" onclick="gameEngine.pauseGame()">⏸ PAUSA</button>
+                </div>
+
+                <div class="game-content" id="gameContent">
+                    <!-- Menu -->
+                    <div id="gameMenu" class="game-menu">
+                        <div style="text-align: center; font-family: 'Press Start 2P', monospace; font-size: 0.9rem; color: var(--neon-green); margin-bottom: 1rem;">ESCOLHA O AMBIENTE</div>
+                        <div class="env-selector">
+                            <div class="env-card" onclick="gameEngine.startGame('rural')">
+                                <div class="env-icon">🌾</div>
+                                <div class="env-name">AMBIENTE RURAL</div>
+                                <div class="env-desc">Embalagens de insumos, compostagem e resíduos do campo</div>
+                                <div class="btn-pixel" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.6rem;">▶ JOGAR</div>
+                            </div>
+                            <div class="env-card" onclick="gameEngine.startGame('urban')">
+                                <div class="env-icon">🏙️</div>
+                                <div class="env-name">AMBIENTE URBANO</div>
+                                <div class="env-desc">Coleta seletiva urbana, reciclagem e destinação correta</div>
+                                <div class="btn-pixel btn-pixel-gold" style="margin-top: 0.5rem; padding: 0.5rem 1rem; font-size: 0.6rem;">▶ JOGAR</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Playing -->
+                    <div id="gamePlay" style="display: none;">
+                        <div style="text-align: center; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; color: var(--neon-green); margin-bottom: 0.75rem;" id="envBadge"></div>
+                        
+                        <div style="font-family: 'Press Start 2P', monospace; font-size: 0.65rem; color: var(--neon-green); margin-bottom: 0.5rem; text-align: center;">SELECIONE O RESÍDUO</div>
+                        <div class="items-grid" id="itemsGrid"></div>
+
+                        <div class="tip-box" id="tipBox">👆 Selecione um item e clique na lixeira correta!</div>
+
+                        <div style="font-family: 'Press Start 2P', monospace; font-size: 0.65rem; color: var(--gold); margin-bottom: 0.5rem; text-align: center;">CLIQUE NA LIXEIRA CORRETA</div>
+                        <div class="bins-row" id="binsRow"></div>
+                    </div>
+
+                    <!-- Result -->
+                    <div id="gameResult" style="display: none;">
+                        <div class="result-screen">
+                            <div class="result-title" id="resultTitle"></div>
+                            <div class="stars" id="starsDisplay"></div>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-label">PONTUAÇÃO</div>
+                                    <div class="stat-number" id="finalScore">0</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">ACERTOS</div>
+                                    <div class="stat-number" id="correctCount">0</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">ERROS</div>
+                                    <div class="stat-number" id="wrongCount">0</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">PRECISÃO</div>
+                                    <div class="stat-number" id="accuracy">0%</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                                <button class="btn-pixel" onclick="gameEngine.reset()">🔄 JOGAR NOVAMENTE</button>
+                                <button class="btn-pixel btn-pixel-gold" onclick="gameEngine.showMenu()">🏠 MENU</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pause -->
+                    <div id="gamePause" style="display: none; text-align: center;">
+                        <div style="font-family: 'Press Start 2P', monospace; font-size: 2rem; color: var(--gold); margin-bottom: 2rem;">⏸ PAUSADO</div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 300px; margin: 0 auto;">
+                            <button class="btn-pixel" onclick="gameEngine.pauseGame()">▶ CONTINUAR</button>
+                            <button class="btn-pixel btn-pixel-gold" onclick="gameEngine.showMenu()">🏠 MENU</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(10, 25, 14, 0.7); border: 2px solid var(--neon-green); font-family: 'Press Start 2P', monospace; font-size: 0.65rem; text-align: center; color: var(--neon-green);">
+                <div style="margin-bottom: 0.75rem;">COMO JOGAR</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.75rem; color: #ccc;">
+                    <div><span style="color: var(--gold);">1</span> 👆 Clique em um resíduo para selecioná-lo</div>
+                    <div><span style="color: var(--gold);">2</span> 🗑️ Clique na lixeira correta para descartar</div>
+                    <div><span style="color: var(--gold);">3</span> ⭐ Acumule pontos e complete as 3 fases!</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GUIDE SECTION -->
+    <section class="guide-section" id="guia">
+        <div class="game-container">
+            <div class="section-header">
+                <h2>GUIA EDUCATIVO</h2>
+                <div class="pixel-divider"></div>
+            </div>
+
+            <div class="guide-tabs">
+                <button class="guide-tab active" onclick="switchGuideTab('bins')">🗑️ LIXEIRAS</button>
+                <button class="guide-tab" onclick="switchGuideTab('composting')">🌱 COMPOSTAGEM</button>
+                <button class="guide-tab" onclick="switchGuideTab('rural')">🌾 RURAL</button>
+            </div>
+
+            <div id="binsGuide" class="guide-content active">
+                <div class="bins-guide" id="binsGuideContent"></div>
+            </div>
+
+            <div id="compostingGuide" class="guide-content">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <p style="text-align: center; margin-bottom: 1.5rem; color: #ccc;">A compostagem transforma resíduos orgânicos em adubo natural rico em nutrientes. É uma prática sustentável essencial tanto no campo quanto na cidade.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;" id="compostingSteps"></div>
+                </div>
+            </div>
+
+            <div id="ruralGuide" class="guide-content">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <p style="text-align: center; margin-bottom: 1.5rem; color: #ccc;">O ambiente rural gera resíduos específicos que exigem cuidados especiais. A destinação incorreta pode contaminar solo, água e prejudicar a saúde.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;" id="ruralGuideContent"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>MISSÃO PLANETA LIMPO</h3>
+                <p>Mini-game educativo desenvolvido para o Concurso Agrinho 2025, promovendo a educação ambiental de forma lúdica e interativa.</p>
+            </div>
+            <div class="footer-section">
+                <h3>NAVEGAÇÃO</h3>
+                <p><a href="#jogo" style="color: var(--neon-green); text-decoration: none;">🎮 Jogar</a></p>
+                <p><a href="#guia" style="color: var(--neon-green); text-decoration: none;">📚 Guia Educativo</a></p>
+                <p><a href="#sobre" style="color: var(--neon-green); text-decoration: none;">ℹ️ Sobre o Projeto</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>CONCURSO AGRINHO</h3>
+                <p>Tema: <strong>Coleta Seletiva e Compostagem</strong></p>
+                <p>Promovido pelo <strong>SENAR-PR</strong> em parceria com as escolas do Paraná.</p>
+                <p style="margin-top: 1rem;">🌍 CUIDAR HOJE, COLHER AMANHÃ</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 MISSÃO PLANETA LIMPO — CONCURSO AGRINHO
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTopBtn" onclick="scrollToTop()">▲</button>
+
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-box" id="feedbackBox"></div>
+    </div>
+
+    <script>
+        // ─── DATA ────────────────────────────────────────────────────────────────
+
+        const BINS = [
+            { type: 'papel', label: 'Papel', color: '#3B82F6', bgColor: '#1D4ED8', emoji: '📄', description: 'Papéis, jornais, revistas, caixas' },
+            { type: 'plastico', label: 'Plástico', color: '#EF4444', bgColor: '#B91C1C', emoji: '🧴', description: 'Garrafas PET, embalagens, sacolas' },
+            { type: 'vidro', label: 'Vidro', color: '#22C55E', bgColor: '#15803D', emoji: '🍾', description: 'Garrafas, potes, frascos de vidro' },
+            { type: 'metal', label: 'Metal', color: '#EAB308', bgColor: '#A16207', emoji: '🥫', description: 'Latas de alumínio, ferro, aço' },
+            { type: 'organico', label: 'Orgânico', color: '#92400E', bgColor: '#78350F', emoji: '🍌', description: 'Restos de comida, cascas, folhas' },
+            { type: 'perigoso', label: 'Perigoso', color: '#F97316', bgColor: '#C2410C', emoji: '⚠️', description: 'Agrotóxicos, pilhas, baterias, químicos' },
+            { type: 'compostagem', label: 'Compostagem', color: '#A3E635', bgColor: '#4D7C0F', emoji: '🌱', description: 'Resíduos orgânicos para adubo natural' },
+        ];
+
+        const WASTE_ITEMS = [
+            // Urban
+            { id: 'garrafa-pet', name: 'Garrafa PET', emoji: '🧴', bin: 'plastico', environment: 'urban', tip: 'Garrafas PET são plástico reciclável. Amasse antes de descartar!' },
+            { id: 'lata-aluminio', name: 'Lata de Alumínio', emoji: '🥤', bin: 'metal', environment: 'urban', tip: 'Latas de alumínio são 100% recicláveis!' },
+            { id: 'garrafa-vidro', name: 'Garrafa de Vidro', emoji: '🍾', bin: 'vidro', environment: 'urban', tip: 'Vidro pode ser reciclado infinitas vezes!' },
+            { id: 'jornal', name: 'Jornal', emoji: '📰', bin: 'papel', environment: 'urban', tip: 'Papel e papelão vão na lixeira azul!' },
+            { id: 'casca-banana', name: 'Casca de Banana', emoji: '🍌', bin: 'organico', environment: 'urban', tip: 'Cascas de frutas são orgânicas!' },
+            { id: 'caixa-papelao', name: 'Caixa de Papelão', emoji: '📦', bin: 'papel', environment: 'urban', tip: 'Papelão é reciclável!' },
+            { id: 'pilha', name: 'Pilha', emoji: '🔋', bin: 'perigoso', environment: 'urban', tip: 'Pilhas são resíduos perigosos!' },
+            { id: 'resto-comida', name: 'Restos de Comida', emoji: '🍖', bin: 'organico', environment: 'urban', tip: 'Restos são orgânicos!' },
+            { id: 'saco-plastico', name: 'Saco Plástico', emoji: '🛍️', bin: 'plastico', environment: 'urban', tip: 'Sacolas vão no plástico!' },
+            { id: 'lata-tinta', name: 'Lata de Tinta', emoji: '🪣', bin: 'perigoso', environment: 'urban', tip: 'Latas de tinta são perigosas!' },
+            // Rural
+            { id: 'embalagem-agro', name: 'Embalagem de Agrotóxico', emoji: '🧪', bin: 'perigoso', environment: 'rural', tip: 'Devem ser devolvidas ao ponto de coleta!' },
+            { id: 'saco-adubo', name: 'Saco de Adubo', emoji: '🌾', bin: 'papel', environment: 'rural', tip: 'Sacos vazios podem ir para reciclagem!' },
+            { id: 'folhas-secas', name: 'Folhas Secas', emoji: '🍂', bin: 'compostagem', environment: 'rural', tip: 'Ótimas para compostagem!' },
+            { id: 'esterco', name: 'Esterco Animal', emoji: '🐄', bin: 'compostagem', environment: 'rural', tip: 'Excelente para compostagem!' },
+            { id: 'frasco-oleo', name: 'Frasco de Óleo', emoji: '⛽', bin: 'perigoso', environment: 'rural', tip: 'Resíduos perigosos!' },
+            { id: 'caixa-rural', name: 'Caixa de Papelão', emoji: '📦', bin: 'papel', environment: 'rural', tip: 'Papelão reciclável!' },
+            { id: 'casca-fruta', name: 'Casca de Fruta', emoji: '🍎', bin: 'compostagem', environment: 'rural', tip: 'Perfeitas para compostagem!' },
+            { id: 'lata-conserva', name: 'Lata de Conserva', emoji: '🥫', bin: 'metal', environment: 'both', tip: 'Latas são metal reciclável!' },
+            { id: 'garrafa-agua', name: 'Garrafa de Água', emoji: '💧', bin: 'plastico', environment: 'both', tip: 'Garrafas plásticas!' },
+            { id: 'papel-escrit', name: 'Papel de Escritório', emoji: '📄', bin: 'papel', environment: 'both', tip: 'Papel reciclável!' },
+        ];
+
+        const COMPOSTING_STEPS = [
+            { step: '01', title: 'Escolha o Local', emoji: '📍', desc: 'Selecione um local sombreado, com boa ventilação.' },
+            { step: '02', title: 'Monte as Camadas', emoji: '🔄', desc: 'Alterne camadas de resíduos verdes com marrons.' },
+            { step: '03', title: 'Mantenha a Umidade', emoji: '💧', desc: 'O composto deve estar úmido como uma esponja.' },
+            { step: '04', title: 'Revire Regularmente', emoji: '🔃', desc: 'Revire a pilha a cada 7-15 dias.' },
+            { step: '05', title: 'Aguarde a Maturação', emoji: '⏰', desc: 'Em 2 a 4 meses estará pronto.' },
+            { step: '06', title: 'Use o Adubo', emoji: '🌱', desc: 'Aplique o composto maduro nas plantas!' },
+        ];
+
+        const RURAL_WASTE = [
+            { title: 'Embalagens de Agrotóxicos', icon: '🧪', color: '#F97316', desc: 'Devem ser lavadas 3 vezes e devolvidas. Lei 9.974/2000!', alert: true },
+            { title: 'Sacos de Sementes', icon: '🌾', color: '#3B82F6', desc: 'Sacos limpos podem ser reciclados como papel.', alert: false },
+            { title: 'Óleos e Lubrificantes', icon: '⛽', color: '#F97316', desc: 'Nunca descarte no solo! Leve a postos de coleta.', alert: true },
+            { title: 'Resíduos Orgânicos', icon: '🐄', color: '#A3E635', desc: 'Esterco, palha e restos são excelentes para compostagem.', alert: false },
+            { title: 'Equipamentos Eletrônicos', icon: '📡', color: '#F97316', desc: 'Devem ir a pontos de coleta de e-lixo.', alert: true },
+            { title: 'Medicamentos Veterinários', icon: '💉', color: '#EF4444', desc: 'Seringas e frascos são resíduos perigosos.', alert: true },
+        ];
+
+        // ─── GAME ENGINE ─────────────────────────────────────────────────────────
+
+        const gameEngine = {
+            phase: 'menu',
+            environment: 'urban',
+            score: 0,
+            lives: 3,
+            timeLeft: 60,
+            currentItems: [],
+            activeItem: null,
+            combo: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            round: 1,
+            timerInterval: null,
+
+            getItemsForEnvironment(env) {
+                return WASTE_ITEMS.filter(item => item.environment === env || item.environment === 'both');
+            },
+
+            shuffleItems(items, count) {
+                const shuffled = [...items].sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, count).map(item => ({
+                    ...item,
+                    id: `${item.id}-${Date.now()}-${Math.random()}`
+                }));
+            },
+
+            showMenu() {
+                this.phase = 'menu';
+                this.activeItem = null;
+                document.getElementById('gameMenu').style.display = 'flex';
+                document.getElementById('gamePlay').style.display = 'none';
+                document.getElementById('gameResult').style.display = 'none';
+                document.getElementById('gamePause').style.display = 'none';
+                document.getElementById('gameHUD').style.display = 'none';
+            },
+
+            startGame(env) {
+                this.environment = env;
+                this.phase = 'playing';
+                this.score = 0;
+                this.lives = 3;
+                this.timeLeft = 60;
+                this.combo = 0;
+                this.totalCorrect = 0;
+                this.totalWrong = 0;
+                this.round = 1;
+                this.activeItem = null;
+
+                const items = this.shuffleItems(this.getItemsForEnvironment(env), 8);
+                this.currentItems = items;
+
+                document.getElementById('gameMenu').style.display = 'none';
+                document.getElementById('gamePlay').style.display = 'block';
+                document.getElementById('gameResult').style.display = 'none';
+                document.getElementById('gamePause').style.display = 'none';
+                document.getElementById('gameHUD').style.display = 'flex';
+
+                this.renderGame();
+                this.startTimer();
+            },
+
+            pauseGame() {
+                if (this.phase === 'playing') {
+                    this.phase = 'paused';
+                    clearInterval(this.timerInterval);
+                    document.getElementById('gamePause').style.display = 'block';
+                    document.getElementById('gamePlay').style.display = 'none';
+                } else if (this.phase === 'paused') {
+                    this.phase = 'playing';
+                    document.getElementById('gamePause').style.display = 'none';
+                    document.getElementById('gamePlay').style.display = 'block';
+                    this.startTimer();
+                }
+            },
+
+            renderGame() {
+                const envBadge = document.getElementById('envBadge');
+                envBadge.textContent = this.environment === 'rural' ? '🌾 AMBIENTE RURAL' : '🏙️ AMBIENTE URBANO';
+                envBadge.style.background = this.environment === 'rural' ? '#78350F' : '#1D4ED8';
+
+                const itemsGrid = document.getElementById('itemsGrid');
+                itemsGrid.innerHTML = '';
+                this.currentItems.slice(0, 8).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'waste-item' + (this.activeItem?.id === item.id ? ' selected' : '');
+                    card.onclick = () => {
+                        this.activeItem = this.activeItem?.id === item.id ? null : item;
+                        this.renderGame();
+                    };
+                    card.innerHTML = `<div class="waste-emoji">${item.emoji}</div><div class="waste-name">${item.name}</div>`;
+                    itemsGrid.appendChild(card);
+                });
+
+                const tipBox = document.getElementById('tipBox');
+                if (this.activeItem) {
+                    tipBox.innerHTML = `<strong style="color: var(--neon-green);">${this.activeItem.name}</strong><br>${this.activeItem.tip}`;
+                } else {
+                    tipBox.innerHTML = '👆 Selecione um item e clique na lixeira correta!';
+                }
+
+                const binsRow = document.getElementById('binsRow');
+                binsRow.innerHTML = '';
+                const activeBins = this.environment === 'rural'
+                    ? BINS.filter(b => ['papel', 'plastico', 'metal', 'perigoso', 'compostagem'].includes(b.type))
+                    : BINS.filter(b => ['papel', 'plastico', 'vidro', 'metal', 'organico', 'perigoso'].includes(b.type));
+
+                activeBins.forEach(bin => {
+                    const slot = document.createElement('button');
+                    slot.className = 'bin-slot';
+                    slot.style.borderColor = bin.color;
+                    slot.style.backgroundColor = this.activeItem ? `${bin.bgColor}cc` : `${bin.bgColor}55`;
+                    slot.onclick = () => this.handleBinDrop(bin.type);
+                    slot.innerHTML = `<div class="bin-emoji">${bin.emoji}</div><div class="bin-label">${bin.label}</div>`;
+                    binsRow.appendChild(slot);
+                });
+
+                this.updateHUD();
+            },
+
+            handleBinDrop(binType) {
+                if (!this.activeItem || this.phase !== 'playing') return;
+
+                const isCorrect = this.activeItem.bin === binType;
+                const capturedItem = this.activeItem;
+
+                if (isCorrect) {
+                    const points = 10 + (this.combo >= 3 ? 5 : 0);
+                    this.score += points;
+                    this.combo++;
+                    this.totalCorrect++;
+                    this.showFeedback('correct', `${this.combo >= 2 ? `COMBO x${this.combo}! ` : ''}+${points} pts`);
+                } else {
+                    this.lives--;
+                    this.score = Math.max(0, this.score - 5);
+                    this.combo = 0;
+                    this.totalWrong++;
+                    const binLabel = BINS.find(b => b.type === capturedItem.bin)?.label || 'Outra';
+                    this.showFeedback('wrong', `Ops! Vai em ${binLabel}`);
+                    if (this.lives <= 0) {
+                        setTimeout(() => this.endGame(false), 600);
+                        return;
+                    }
+                }
+
+                this.currentItems = this.currentItems.filter(i => i.id !== capturedItem.id);
+                if (this.currentItems.length < 4) {
+                    const allItems = this.getItemsForEnvironment(this.environment);
+                    const existingIds = this.currentItems.map(i => i.id.split('-')[0]);
+                    const newPool = allItems.filter(i => !existingIds.includes(i.id));
+                    if (newPool.length > 0) {
+                        const newItem = newPool[Math.floor(Math.random() * newPool.length)];
+                        this.currentItems.push({
+                            ...newItem,
+                            id: `${newItem.id}-${Date.now()}-${Math.random()}`
+                        });
+                    }
+                }
+
+                this.activeItem = null;
+
+                if (isCorrect && this.totalCorrect >= 10 * this.round) {
+                    if (this.round >= 3) {
+                        setTimeout(() => this.endGame(true), 600);
+                    } else {
+                        this.round++;
+                        this.timeLeft = 60;
+                        this.currentItems = this.shuffleItems(this.getItemsForEnvironment(this.environment), 8);
+                    }
+                }
+
+                this.renderGame();
+            },
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateHUD();
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        this.endGame(this.score >= 50);
+                    }
+                }, 1000);
+            },
+
+            updateHUD() {
+                document.getElementById('scoreDisplay').textContent = String(this.score).padStart(6, '0');
+                document.getElementById('timerDisplay').textContent = this.timeLeft;
+                document.getElementById('roundDisplay').textContent = `${this.round}/3`;
+
+                const livesDisplay = document.getElementById('livesDisplay');
+                livesDisplay.innerHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    const heart = document.createElement('span');
+                    heart.className = 'heart';
+                    heart.textContent = '❤️';
+                    if (i >= this.lives) heart.style.filter = 'grayscale(1) opacity(0.3)';
+                    livesDisplay.appendChild(heart);
+                }
+            },
+
+            showFeedback(type, message) {
+                const overlay = document.getElementById('feedbackOverlay');
+                const box = document.getElementById('feedbackBox');
+                box.className = `feedback-box ${type}`;
+                box.innerHTML = `<div style="font-size: 1.5rem; margin-bottom: 0.5rem;">${type === 'correct' ? '✅' : '❌'}</div><div>${message}</div>`;
+                overlay.classList.add('show');
+                setTimeout(() => overlay.classList.remove('show'), 1800);
+            },
+
+            endGame(victory) {
+                clearInterval(this.timerInterval);
+                this.phase = victory ? 'victory' : 'gameover';
+
+                const resultTitle = document.getElementById('resultTitle');
+                resultTitle.textContent = victory ? '🏆 PARABÉNS!' : '💀 GAME OVER';
+                resultTitle.className = `result-title ${victory ? 'victory' : 'gameover'}`;
+
+                const stars = Math.min(3, Math.max(1, Math.floor(this.score / 50)));
+                const starsDisplay = document.getElementById('starsDisplay');
+                starsDisplay.innerHTML = '';
+                for (let i = 1; i <= 3; i++) {
+                    const star = document.createElement('span');
+                    star.textContent = '⭐';
+                    if (i <= stars) star.classList.add('filled');
+                    else star.classList.add('star');
+                    starsDisplay.appendChild(star);
+                }
+
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('correctCount').textContent = this.totalCorrect;
+                document.getElementById('wrongCount').textContent = this.totalWrong;
+                const accuracy = this.totalCorrect + this.totalWrong > 0
+                    ? Math.round((this.totalCorrect / (this.totalCorrect + this.totalWrong)) * 100)
+                    : 0;
+                document.getElementById('accuracy').textContent = accuracy + '%';
+
+                document.getElementById('gamePlay').style.display = 'none';
+                document.getElementById('gameResult').style.display = 'block';
+                document.getElementById('gameHUD').style.display = 'none';
+            },
+
+            reset() {
+                this.startGame(this.environment);
+            }
+        };
+
+        // ─── GUIDE FUNCTIONS ─────────────────────────────────────────────────────
+
+        function switchGuideTab(tab) {
+            document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.guide-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Guide').classList.add('active');
+        }
+
+        function initializeGuide() {
+            // Bins Guide
+            const binsGuideContent = document.getElementById('binsGuideContent');
+            BINS.forEach(bin => {
+                const card = document.createElement('div');
+                card.className = 'bin-guide-card';
+                card.style.borderColor = bin.color;
+                const items = WASTE_ITEMS.filter(w => w.bin === bin.type).map(w => w.name);
+                card.innerHTML = `
+                    <div class="bin-guide-header">
+                        <div class="bin-color-box" style="background-color: ${bin.bgColor}; border-color: ${bin.color};">${bin.emoji}</div>
+                        <div class="bin-guide-label" style="color: ${bin.color};">${bin.label}</div>
+                    </div>
+                    <ul class="bin-guide-items" style="color: ${bin.color};">
+                        ${items.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                `;
+                binsGuideContent.appendChild(card);
+            });
+
+            // Composting Guide
+            const compostingSteps = document.getElementById('compostingSteps');
+            COMPOSTING_STEPS.forEach(step => {
+                const card = document.createElement('div');
+                card.style.cssText = 'padding: 1rem; background: rgba(10, 25, 14, 0.85); border: 3px solid #A3E635; transition: all 0.2s;';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div style="font-family: 'Press Start 2P', monospace; font-size: 1rem; color: #A3E635;">${step.step}</div>
+                        <span style="font-size: 1.5rem;">${step.emoji}</span>
+                    </div>
+                    <div style="font-weight: bold; color: #A3E635; margin-bottom: 0.5rem; font-family: 'Nunito', sans-serif;">${step.title}</div>
+                    <p style="font-size: 0.85rem; color: #ccc; line-height: 1.5;">${step.desc}</p>
+                `;
+                compostingSteps.appendChild(card);
+            });
+
+            // Rural Guide
+            const ruralGuideContent = document.getElementById('ruralGuideContent');
+            RURAL_WASTE.forEach(item => {
+                const card = document.createElement('div');
+                card.style.cssText = `padding: 1rem; background: rgba(10, 25, 14, 0.85); border: 3px solid ${item.color}; transition: all 0.2s;`;
+                card.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 2rem; flex-shrink: 0;">${item.icon}</span>
+                        <div>
+                            <div style="font-weight: bold; color: ${item.color}; margin-bottom: 0.5rem; font-family: 'Nunito', sans-serif;">${item.title}${item.alert ? ' ⚠️' : ''}</div>
+                            <p style="font-size: 0.85rem; color: #ccc; line-height: 1.5;">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+                ruralGuideContent.appendChild(card);
+            });
+        }
+
+        // ─── UTILITY FUNCTIONS ───────────────────────────────────────────────────
+
+        function scrollToGame() {
+            document.getElementById('jogo').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollToTopBtn');
+            btn.classList.toggle('show', window.scrollY > 300);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            gameEngine.showMenu();
+            initializeGuide();
+        });
+    </script>
+</body>
+</html>
